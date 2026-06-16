@@ -6,6 +6,7 @@
 
 ## The Topology
 
+<img width="1562" height="866" alt="TOPOLOGY 3" src="https://github.com/user-attachments/assets/66334ec8-bd2b-47bc-829b-c4779eff9fdf" />
 
 ---
 
@@ -50,11 +51,8 @@ Pushed configurations to all CAP devices. One master controller. Automatic provi
 **What I did:** Enabled Hotspot on the Guest SSID (VLAN 20). Configured captive portal with custom login page. All guest traffic is blocked until authentication completes.
 
 **Hotspot features deployed:**
-- SSL certificate for HTTPS login page
 - RADIUS authentication against User Manager
 - Session accounting and bandwidth limiting
-- Automatic logout timers (4 hour session / 30 minute idle)
-- Walled garden for DNS and NTP before login
 
 **What it achieves:** Guests don't just get a PSK they can share. They need individual credentials. Vouchers can be time-limited. Access is tracked.
 
@@ -64,7 +62,8 @@ Pushed configurations to all CAP devices. One master controller. Automatic provi
 
 **What I did:** Configured a dedicated MikroTik router as an external RADIUS server running User Manager (IP: 192.168.1.3). Both core routers point to this single RADIUS endpoint for:
 - CAPsMAN user authentication (WPA2-Enterprise)
-- Hotspot user authentication (captive portal)
+- Hotspot user authentication (Captive Portal)
+- Vouchers
 
 **What it achieves:** Centralized credentials. One source of truth. Both CAPsMAN controllers use the same authentication backend, so failover doesn't break login. Hotspot sessions persist across gateway failover.
 
@@ -85,23 +84,19 @@ Pushed configurations to all CAP devices. One master controller. Automatic provi
 **What I did:** Powered on both CAPs. Watched them join CAPsMAN automatically. Scanned for SSIDs.
 
 **What happened:** Both Acess Points appeared in CAPsMAN. SSIDs "Users" and "Guests" visible. AP1 on Channel 1 (2412 MHz) . AP2 on Channel 6 (2437 MHz). 
-No manual config on each CAPs (Access Points). Users SSID got IP from VLAN 10. Guests SSID got IP from VLAN 20. Traffic isolated at Layer 2.
+No manual config on each CAPs (Access Points). Users SSID got IP from VLAN 10. Guests SSID got IP from VLAN 20. Traffic isolated at Layer 2. Zero-touch AP deployment.
 
 
 https://github.com/user-attachments/assets/cf41f4c8-7729-4382-a6e5-de0760f9031d
 
 
-**The win:** Zero-touch AP deployment.
-
 ---
 
 ### Test 2: Hotspot Captive Portal Authentication
 
-**What I did:** Connected to Guests SSID (open network). Opened browser. Entered Hotspot credentials.
+**What I did:** Connected to Users and Guests SSID (open network). Opened browser. Entered Hotspot credentials.
 
 **What happened:** Browser redirected to captive portal. Hotspot authenticated. Traffic flowed.
-
-**The win:** Guest access controlled entirely by Hotspot.
 
 https://github.com/user-attachments/assets/d821f5fd-8065-4e4b-8be2-490566accd6b
 
@@ -111,9 +106,8 @@ https://github.com/user-attachments/assets/d821f5fd-8065-4e4b-8be2-490566accd6b
 
 **What I did:** Connected to Guests & Users SSID and opened the captive portal. Entered active credentials verified by the external User Manager server backend.
 
-**What happened:** Hotspot offloaded the handshake to the RADIUS backend over port 3799. Radius Server verified the lease, tracked user data limits, and dynamically authorized the session.
+**What happened:** Hotspot offloaded the handshake to the RADIUS backend over port 3799. Radius Server verified the lease, and dynamically authorized the session.
 
-**The win:** Authentication decoupled from local gateway RAM, allowing seamless user state persistence during core routing failovers.
 
 https://github.com/user-attachments/assets/c54f0d66-923a-480d-a848-e828d6770322
 
@@ -123,9 +117,7 @@ https://github.com/user-attachments/assets/c54f0d66-923a-480d-a848-e828d6770322
 
 **What I did:** Took down Core R1 while client held Hotspot session.
 
-**What happened:** CAP detected primary loss within 3 seconds. Established new tunnel to Core R2 in ~6 seconds. Full CAP re-join at ~9.2 seconds. Hotspot config re-applied within ~15-20 seconds.
-
-**The win:** Wireless recovers. Session re-validates. No re-authentication needed.
+**What happened:** CAP detected primary loss within 3 seconds. Established new tunnel to Core R2 in ~6 seconds. Full CAP re-join at ~9.2 seconds. Hotspot config re-applied within ~15-20 seconds. Wireless recovers, due to automatic session Cookies. No re-authentication needed.
 
 https://github.com/user-attachments/assets/96d21ee4-f8b8-4a5d-80a0-0d8f5003c68d
 
