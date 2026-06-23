@@ -168,4 +168,4 @@ I built a wireless network that:
 
 ---
 
-*Fourth project down. More to come.* 🔥
+*Fourth project down. More to come.*
